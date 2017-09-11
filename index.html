@@ -1,0 +1,213 @@
+<!--
+*	Author:	Ronald Byrne
+*	Assignment:	WE41 Mobile	Web	Applications,	Digital	Skills	Academy
+*	Date	:	2016/08/15
+*	Ref:	JSON data comes live from www.developer.forecast.io
+			Code snippets from W3Shools.com and https://www.youtube.com/watch?v=nMk24t2Vw30
+-->
+
+
+<!DOCTYPE html>
+<html>
+<head>
+
+	<title>Weather Wherever</title>
+<link rel="stylesheet" href="css/themes/CreamTeal2.css" />
+<link rel="stylesheet" href="css/themes/jquery.mobile.icons.min.css" />
+<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile.structure-1.4.5.min.css" />
+<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+<link rel="stylesheet" type="text/css" href="css/stylesheet.css">
+
+
+<!-- Ajax request to get weather data from www.developer.forecast.io -->
+<script type="text/javascript">
+
+
+
+//associative array to associate weather types from the third party API with corresponding icons. 
+// Icons are from http://www.alessioatzeni.com/meteocons/ which are included in stylesheet.css
+
+		var icons = {	"clear-day" : "B",
+						"clear-night" : "C",
+						"rain" : "R",
+						"snow" : "G",
+						"sleet" : "X",
+						"wind"	: "S",
+						"fog"	: "N",
+						"cloudy" : "Y",
+						"partly-cloudy-day" : "H",
+						"mostly-cloudy-day" : "N",
+						"partly-cloudy-night" : "I"
+					};
+
+// associative array to match cities to longitude/latitude co-ordinates
+
+var cities = 	{
+				
+				"abu dhabi" : 		{coords: {latitude: 24.2992, longitude: 54.6973}},
+				"amsterdam" : 		{coords: {latitude: 52.3702, longitude: 4.8952}},
+				"berlin" 	: 		{coords: {latitude: 52.5200, longitude: 13.4050}},
+				"bucharest" : 		{coords: {latitude: 44.4268, longitude: 26.1025}},
+				"cork" 		: 		{coords: {latitude: 51.8969, longitude:-8.4863}},
+				"derry" 	: 		{coords: {latitude: 54.9966, longitude:-7.3086}},
+				"dubai" 	: 		{coords: {latitude: 25.2048, longitude: 55.2708}},
+				"dublin" 	: 		{coords: {latitude: 53.3498, longitude:-6.2603}},
+				"galway" 	: 		{coords: {latitude: 53.2707, longitude:-9.0568}},
+				"hong kong"	: 		{coords: {latitude: 22.3964, longitude: 114.1095}},
+				"kingston" 	: 		{coords: {latitude: 18.0179, longitude: -76.8099}},
+				"limerick"	: 		{coords: {latitude: 52.6680, longitude:-8.6305}},
+				"london" 	: 		{coords: {latitude: 51.5074, longitude: -0.1278}},
+				"new york" 	: 		{coords: {latitude: 40.672060, longitude:-73.983898}},
+				"paris" 	: 		{coords: {latitude: 48.8566, longitude: 2.3522}},
+				"prague" 	: 		{coords: {latitude: 50.0755, longitude: 14.4378}},
+				"rome" 		: 		{coords: {latitude: 41.9028, longitude: 12.4964}},
+				"stockholm" : 		{coords: {latitude: 59.3293, longitude: 18.0686}},
+				"tripoli" 	: 		{coords: {latitude: 32.8872, longitude: 13.1913}},
+				"zagreb" 	: 		{coords: {latitude: 45.8150, longitude: 15.9819}},
+				"current location" : ""
+
+			};
+
+function loadWeather(cityCoords){
+
+
+		var latlng = cityCoords.coords.latitude + "," + cityCoords.coords.longitude;
+
+		var forecastURL ="https://api.forecast.io/forecast/d738dcf277fe496f54c39c974b9f4c6e/"+latlng+"?units=uk2";
+
+			$.ajax({
+				url: forecastURL,
+				jsonCallback: 'jsonCallback',
+				contentType: "application/json",
+				dataType: 'jsonp',
+				success: function(json) {
+					console.log(json);
+
+		//accessing the json nodes for current time and temperature
+					$("#current_temp").html(Math.round(json.currently.temperature)+"&#176;C");
+					$("#current_summary").html(json.currently.summary);
+					$("#current_temp").attr("data-icon",icons[json.currently.icon]);
+
+					// new function to fade in weather content div
+					$('#weather_content').fadeIn();
+
+					
+				},
+				error: function(e) {
+					console.log(e.message);
+				}
+			});
+
+	}
+
+
+	function loadCity(city){
+		$("#location").html(city);
+
+// checks current location using geoLocation, if allowed
+		if (city.toLowerCase() == "current location"){
+			if ( navigator.geoLocation )
+				navigator.geoLocation.getCurrentPosition(loadWeather,loadDefaultCity);
+
+//else load the default city
+			else {
+				loadDefaultCity();
+			}
+
+		}  else
+
+			loadWeather(cities[city.toLowerCase()]);
+
+		}
+	
+
+	function loadDefaultCity(){
+			loadCity("Dublin");
+
+	}
+
+
+	$(document).ready(function(){
+			loadCity("Dublin");
+
+// function to over-ride click on City a href tags 
+
+			$("a.city").bind("click",function(){
+				loadCity($(this).html());
+
+			});
+
+	});
+
+</script>
+
+
+</head>
+
+<!-- Page one left panel -->
+
+<body>
+	<div data-role="page" id="pageone">
+	<div data-role="panel" data-display ="overlay" data-position-fixed="false" id="left-panel">
+    <ul data-role="listview" data-filter="true" data-filter-placeholder= "filter cities">
+    	<li data-icon="delete"><a href="#" data-rel="close">Close</a></li>
+    	<li data-role="list-divider">Select a City (scroll down)</li>
+    	<li><a href="" class="city" data-rel="close">Current Location</a></li>
+    	<li><a href="" class="city" data-rel="close">Abu Dhabi</a></li>
+    	<li><a href="" class="city" data-rel="close">Amsterdam</a></li>	
+    	<li><a href="" class="city" data-rel="close">Berlin</a></li>
+    	<li><a href="" class="city" data-rel="close">Bucharest</a></li>
+	   	<li><a href="" class="city" data-rel="close">Cork</a></li>
+    	<li><a href="" class="city" data-rel="close">Derry</a></li>
+      	<li><a href="" class="city" data-rel="close">Dubai</a></li>
+    	<li><a href="" class="city" data-rel="close">Dublin</a></li>
+    	<li><a href="" class="city" data-rel="close">Galway</a></li>
+    	<li><a href="" class="city" data-rel="close">Hong Kong</a></li>
+    	<li><a href="" class="city" data-rel="close">Kingston</a></li>
+    	<li><a href="" class="city" data-rel="close">Limerick</a></li>
+    	<li><a href="" class="city" data-rel="close">London</a></li>
+    	<li><a href="" class="city" data-rel="close">New York</a></li>
+    	<li><a href="" class="city" data-rel="close">Paris</a></li>
+    	<li><a href="" class="city" data-rel="close">Prague</a></li>
+    	<li><a href="" class="city" data-rel="close">Rome</a></li>
+    	<li><a href="" class="city" data-rel="close">Stockholm</a></li>
+    	<li><a href="" class="city" data-rel="close">Tripoli</a></li>
+    	<li><a href="" class="city" data-rel="close">Zagreb</a></li>
+    </ul>
+</div><!-- panel ends -->
+
+<!-- Main content page -->
+
+	<div data-role="header" data-position="fixed">
+		<h1>Weatherwhere</h1>
+		<a href="#left-panel" data-icon="bars" data-role = "button" data-iconpos="notext">Menu</a>
+		<a href="#help-page" data-transition="flip" data-icon="info" data-role = "button" data-iconpos="notext">Help</a>
+	</div>
+	<div data-role="content" class="content" id="weather_content">
+		<h1 id="current_temp" class="icon" data-icon="Y"></h1>
+		<p id="current_summary">Weatherwhere</p>
+		<p id="location">Weather wherever<b></b> you are</p>
+
+	</div>
+
+</div>
+
+<!-- Help page -->
+
+<div data-role="page" id="help-page">
+		<div data-role="header" data-position="fixed">
+				<a href="#pageone" class="ui-btn-right" data-transition="slidefade" data-icon="back" data-role = "button" data-iconpos="notext">Back</a>
+		<h1>Help Page</h1></div>
+
+ 
+  <div data-role ="content" class="content">
+  		<h2>Weatherwhere</h2> <p>Using live meteorological data, <strong>Weatherwhere</strong> will show the temperature and weather summary in many cities around the world, including your current location, if you have location settings enabled.</p>
+		<p>To select a city, simply click on the menu button on the top left of the home screen and select from the list. To filter the list, search using the search bar at the top.</p></div>
+</div>
+
+<!-- Help page ends -->
+
+</body>
+
+</html>

@@ -1,0 +1,61 @@
+/*
+
+*   Author: Ronald Byrne
+*   Assignment: WE41 Mobile Web Applications,   Digital Skills  Academy
+*   Date    :   2016/08/15
+*   Ref:    Icons for weather are from http://www.alessioatzeni.com/meteocons/
+*/
+
+
+@font-face {
+    font-family: 'MeteoconsRegular';
+    src: url('meteocons-webfont.eot');
+    src: url('meteocons-webfont.eot?#iefix') format('embedded-opentype'),
+         url('meteocons-webfont.woff') format('woff'),
+         url('meteocons-webfont.ttf') format('truetype'),
+         url('meteocons-webfont.svg#MeteoconsRegular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+
+.icon:before {
+	font-family: 'MeteoconsRegular';
+	content: attr(data-icon);
+}
+
+/* Larger font styling for 
+Temperature and Summary display on main page */
+
+#current_temp {
+	font-size: 3em;
+}
+
+#current_summary {
+	font-size: 1.5em;
+}
+
+#current_location {
+	font-size: 3em;
+}
+
+.content {
+	text-align: center;
+}
+
+.p {
+    text-align: center;
+}
+
+
+/* custom css to make left panel scroll without scrolling main content page */
+.ui-panel-inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0px;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+}
